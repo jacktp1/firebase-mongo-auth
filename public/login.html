@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // ✅ Use your real Firebase config (same as in index.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXGDHrCkWGhaepToT8q8zs0lb3YPHfXIw",
+      authDomain: "fir-auth-f2751.firebaseapp.com",
+      projectId: "fir-auth-f2751",
+      storageBucket: "fir-auth-f2751.firebasestorage.app",
+      messagingSenderId: "590830307853",
+      appId: "1:590830307853:web:d9367298a0bac5a217e344"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ===== LOGIN FUNCTION =====
+    window.loginUser = async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        const token = await userCred.user.getIdToken();
+
+        const res = await fetch("http://localhost:5000/api/auth/getUserData", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+
+        // ✅ Handle possible HTML error response gracefully
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error("Server returned invalid JSON: " + text);
+        }
+
+        if (res.ok) {
+          localStorage.setItem("userData", JSON.stringify(data));
+          alert("Login successful!");
+          window.location.href = "dashboard.html";
+        } else {
+          alert(data.message || "Login failed");
+        }
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <h2>Login</h2>
+  <form onsubmit="loginUser(event)">
+    <label>Email:</label><br />
+    <input type="email" id="email" required /><br /><br />
+    <label>Password:</label><br />
+    <input type="password" id="password" required /><br /><br />
+    <button type="submit">Login</button>
+  </form>
+</body>
+</html>

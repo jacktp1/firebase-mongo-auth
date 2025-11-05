@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firebase + MongoDB Signup</title>
+  <script type="module">
+    // ====== Firebase Setup ======
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyCXGDHrCkWGhaepToT8q8zs0lb3YPHfXIw",
+    authDomain: "fir-auth-f2751.firebaseapp.com",
+    projectId: "fir-auth-f2751",
+    storageBucket: "fir-auth-f2751.firebasestorage.app",
+    messagingSenderId: "590830307853",
+    appId: "1:590830307853:web:d9367298a0bac5a217e344"
+   };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ====== Handle Signup ======
+    document.addEventListener("DOMContentLoaded", () => {
+      const signupForm = document.getElementById("signupForm");
+
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const subject1 = document.getElementById("subject1").value;
+        const subject2 = document.getElementById("subject2").value;
+        const subject3 = document.getElementById("subject3").value;
+
+        try {
+          // Create user in Firebase Auth
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          // Send user info to your Node.js backend (MongoDB)
+          const response = await fetch("http://localhost:5000/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              uid: user.uid,
+              email: user.email,
+              name,
+              subject1,
+              subject2,
+              subject3
+            })
+          });
+
+          const data = await response.json();
+          alert("Signup successful! User saved in MongoDB.");
+          signupForm.reset();
+        } catch (error) {
+          console.error(error);
+          alert("Error: " + error.message);
+        }
+      });
+    });
+  </script>
+  <style>
+    body {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+    }
+    a.btn {
+      width: 100%;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Sign Up</h2>
+  <form id="signupForm">
+    <input type="text" id="name" placeholder="Full Name" required /><br><br>
+    <input type="email" id="email" placeholder="Email" required /><br><br>
+    <input type="password" id="password" placeholder="Password" required /><br><br>
+    <input type="text" id="subject1" placeholder="Subject 1" required /><br><br>
+    <input type="text" id="subject2" placeholder="Subject 2" required /><br><br>
+    <input type="text" id="subject3" placeholder="Subject 3" required /><br><br>
+    <button type="submit">Sign Up</button>
+  </form>
+</body>
+</html>
+
