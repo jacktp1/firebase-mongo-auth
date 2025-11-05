@@ -59,4 +59,8 @@ Then open:
 
 http://localhost:5000 → Signup page
 
+<<<<<<< HEAD
 http://localhost:5000/login.html → Login page
+=======
+http://localhost:5000/login.html → Login page
+>>>>>>> 79275dd (Moved project files into src folder for Render)
