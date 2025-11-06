@@ -31,7 +31,7 @@
         const userCred = await signInWithEmailAndPassword(auth, email, password);
         const token = await userCred.user.getIdToken();
 
-        const res = await fetch("http://localhost:5000/api/auth/getUserData", {
+        const res = await fetch("https://firebase-mongo-auth.onrender.com/api/auth/getUserData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token })

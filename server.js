@@ -51,4 +51,11 @@ mongoose
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
+  // ===== whitelist deployed domain on Render =====
+  app.use(cors({
+  origin: ["https://firebase-mongo-auth.onrender.com"],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
+
 
